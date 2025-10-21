@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海报屏保模式</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* 马赛克屏保容器 */
+        .screensaver {
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-rows: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0;
+        }
+
+        /* 马赛克图片单元 */
+        .mosaic-item {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+
+        /* 3D翻滚动画 */
+        .flipping {
+            animation: flip3d 1.2s forwards;
+        }
+
+        @keyframes flip3d {
+            0% { transform: rotateY(0deg) scale(1); opacity: 1; }
+            50% { transform: rotateY(90deg) scale(0.8); opacity: 0.5; }
+            100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+        }
+
+        /* 加载提示 */
+        .loading {
+            color: white;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+        }
+
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">加载屏保中...</div>
+    <div class="screensaver" id="screensaver"></div>
+
+    <script>
+        let allPosters = [];
+        let usedPosters = new Set();
+        let unusedPosters = [];
+        let mosaicItems = [];
+
+        // 初始化屏保
+        window.onload = async () => {
+            try {
+                const response = await fetch('poster_paths.json');
+                if (!response.ok) throw new Error('未找到海报数据');
+                
+                allPosters = await response.json();
+                document.getElementById('loading').style.display = 'none';
+
+                // 初始化未展示队列并打乱
+                unusedPosters = [...allPosters];
+                shuffleArray(unusedPosters);
+
+                // 创建马赛克布局
+                initMosaic();
+
+                // 开始循环替换
+                startCycle();
+
+                // 监听ESC键返回海报墙
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        window.location.href = 'index.html';
+                    }
+                });
+
+            } catch (error) {
+                document.getElementById('loading').textContent = `加载失败：${error.message}`;
+            }
+        };
+
+        // 初始化马赛克网格
+        function initMosaic() {
+            const screensaver = document.getElementById('screensaver');
+            const cols = Math.ceil(window.innerWidth / 120);
+            const rows = Math.ceil(window.innerHeight / 180);
+            const totalItems = cols * rows;
+
+            for (let i = 0; i < totalItems; i++) {
+                const img = document.createElement('img');
+                img.className = 'mosaic-item';
+                const [poster, newUnused] = getNextUnused();
+                unusedPosters = newUnused;
+                img.src = poster;
+                img.onerror = () => img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFeAJ5gMm8dgAAAABJRU5ErkJggg==';
+                screensaver.appendChild(img);
+                mosaicItems.push(img);
+            }
+        }
+
+        // 循环替换图片
+        function startCycle() {
+            setInterval(() => {
+                if (mosaicItems.length === 0) return;
+                
+                // 随机选择一个图片单元
+                const randomIdx = Math.floor(Math.random() * mosaicItems.length);
+                const target = mosaicItems[randomIdx];
+
+                // 应用3D翻滚动画
+                target.classList.add('flipping');
+
+                // 动画中途切换图片
+                setTimeout(() => {
+                    // 回收当前图片到未展示队列
+                    const currentSrc = target.src.split('/').pop();
+                    const originalPath = allPosters.find(p => p.includes(currentSrc));
+                    if (originalPath && !unusedPosters.includes(originalPath)) {
+                        unusedPosters.push(originalPath);
+                    }
+
+                    // 获取下一张未展示的图片
+                    const [nextPoster, newUnused] = getNextUnused();
+                    unusedPosters = newUnused;
+                    target.src = nextPoster;
+
+                    // 动画结束后移除类名
+                    setTimeout(() => target.classList.remove('flipping'), 600);
+                }, 600);
+
+            }, 1500); // 每1.5秒替换一张
+        }
+
+        // 获取下一张未展示的海报
+        function getNextUnused() {
+            if (unusedPosters.length === 0) {
+                // 队列空了就重置
+                unusedPosters = [...usedPosters];
+                usedPosters.clear();
+                shuffleArray(unusedPosters);
+            }
+            const next = unusedPosters.shift();
+            usedPosters.add(next);
+            return [next, unusedPosters];
+        }
+
+        // 打乱数组顺序
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+    </script>
+</body>
+</html>

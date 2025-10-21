@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的豆瓣观影海报墙</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            padding-bottom: 40px;
+        }
+
+        /* 苹果风格渐显动画（关键帧） */
+        @keyframes appleFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 苹果默认动画曲线（ease-out-expo 近似效果） */
+        .apple-animate {
+            animation: appleFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0; /* 初始隐藏 */
+        }
+
+        /* 延迟动画序列（错开显示时间） */
+        .header {
+            animation-delay: 0.1s;
+        }
+        .stats {
+            animation-delay: 0.25s;
+        }
+        .poster-wall {
+            animation-delay: 0.4s;
+        }
+
+        /* 顶部区域 */
+        .header {
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1d1d1f;
+        }
+
+        /* 统计信息 */
+        .stats {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            color: #6e6e73; /* 苹果次要文本色 */
+            opacity: 0;
+        }
+
+        /* 苹果液态玻璃风格按钮 */
+        .glass-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 30px;
+            color: #1d1d1f;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* 苹果动画曲线 */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 36px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .glass-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 海报墙网格 */
+        .poster-wall {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            opacity: 0;
+        }
+
+        .poster-item {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                        box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background-color: white;
+        }
+
+        .poster-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .poster-item:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 加载提示 */
+        .loading {
+            text-align: center;
+            padding: 50px 0;
+            font-size: 1.2rem;
+            color: #6e6e73;
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部区域（带渐显动画） -->
+    <div class="header apple-animate">
+        <h1>我的豆瓣观影海报墙</h1>
+        <button class="glass-btn" onclick="window.location.href='screensaver.html'">
+            进入屏保模式
+        </button>
+    </div>
+
+    <!-- 统计信息（带渐显动画） -->
+    <div class="stats apple-animate" id="stats">
+        共 <span id="posterCount">0</span> 张海报
+    </div>
+
+    <div class="loading" id="loading">加载海报中...</div>
+    <!-- 海报墙（带渐显动画） -->
+    <div class="poster-wall apple-animate" id="posterWall"></div>
+
+    <script>
+        // 加载海报数据并渲染
+        window.onload = async () => {
+            try {
+                const response = await fetch('poster_paths.json');
+                if (!response.ok) throw new Error('未找到海报数据');
+                
+                const posterPaths = await response.json();
+                const wall = document.getElementById('posterWall');
+                const loading = document.getElementById('loading');
+                const countElem = document.getElementById('posterCount');
+                
+                // 更新统计数量
+                countElem.textContent = posterPaths.length;
+                
+                // 隐藏加载提示
+                loading.style.display = 'none';
+
+                // 渲染海报墙
+                posterPaths.forEach(path => {
+                    const container = document.createElement('div');
+                    container.className = 'poster-item';
+                    
+                    const img = document.createElement('img');
+                    img.src = path;
+                    img.alt = '电影海报';
+                    img.onerror = () => img.src = 'https://via.placeholder.com/150x225?text=缺失';
+                    
+                    container.appendChild(img);
+                    wall.appendChild(container);
+                });
+
+            } catch (error) {
+                document.getElementById('loading').textContent = `加载失败：${error.message}`;
+            }
+        };
+    </script>
+</body>
+</html>
