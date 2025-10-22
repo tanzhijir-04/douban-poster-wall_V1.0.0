@@ -2,6 +2,10 @@
 
 一个自动爬取你的豆瓣 “已看” 和 “想看” 电影海报，生成个性化海报墙和 3D 动态屏保的项目。支持本地、GitHub+Vercel、Docker 等多环境部署，适配电脑、手机和安卓电视。
 
+### 您可以爱发电赞助我：https://afdian.com/a/tanz666
+### 网页效果预览
+ https://tanzhijir-04.github.io/douban-poster-wall_V1.0.0/
+
 
 
 ## 项目介绍
@@ -45,6 +49,7 @@
 2. （可选）豆瓣 Cookie（用于私密列表爬取）：
    - 浏览器登录豆瓣，按 F12→Network→复制任意请求的`Cookie`字段。
 
+3. 初始使用前，请将 `posters` 文件夹、`poster_paths.json` 清空，不然显示的就是我的内容。
 
 ### 部署方案
 
