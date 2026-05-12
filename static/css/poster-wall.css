@@ -1,0 +1,103 @@
+body {
+    padding-bottom: var(--space-xxl);
+}
+
+/* 交错动画延迟 */
+.header {
+    animation-delay: 0.1s;
+}
+.stats {
+    animation-delay: 0.25s;
+}
+.poster-wall {
+    animation-delay: 0.4s;
+}
+
+/* 头部 */
+.header {
+    padding: var(--space-lg);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.header h1 {
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: 15px;
+    color: var(--color-text-primary);
+}
+
+/* 统计信息 */
+.stats {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: var(--font-size-body);
+    color: var(--color-text-secondary);
+    opacity: 0;
+}
+
+/* 毛玻璃按钮 */
+.glass-btn {
+    padding: var(--space-sm) var(--space-xl);
+    background: var(--color-glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--color-glass-border);
+    border-radius: var(--radius-pill);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all 0.3s var(--ease-apple);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
+
+.glass-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px 0 rgba(31, 38, 135, 0.15);
+}
+
+.glass-btn:active {
+    transform: translateY(0);
+}
+
+/* 海报墙网格 */
+.poster-wall {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-lg);
+    padding: 0 var(--space-lg);
+    max-width: 1600px;
+    margin: 0 auto;
+    opacity: 0;
+}
+
+.poster-item {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--color-shadow);
+    transition: transform 0.3s var(--ease-apple),
+                box-shadow 0.3s var(--ease-apple);
+    background-color: var(--color-surface);
+}
+
+.poster-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.poster-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px var(--color-shadow-hover);
+}
+
+/* 加载提示 */
+.loading {
+    text-align: center;
+    padding: 50px 0;
+    font-size: var(--font-size-loading);
+    color: var(--color-text-secondary);
+}

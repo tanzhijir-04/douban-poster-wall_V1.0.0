@@ -1,0 +1,65 @@
+body {
+    background-color: var(--color-bg-dark);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* 屏保模式光标隐藏 */
+body.cursor-hidden {
+    cursor: none;
+}
+
+/* 马赛克屏保容器 */
+.screensaver {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0;
+}
+
+/* 马赛克图片单元 */
+.mosaic-item {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+/* 3D翻滚动画 */
+.flipping {
+    animation: flip3d 1.2s var(--ease-apple) forwards;
+}
+
+@keyframes flip3d {
+    0% {
+        transform: rotateY(0deg) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: rotateY(90deg) scale(0.8);
+        opacity: 0.5;
+    }
+    100% {
+        transform: rotateY(0deg) scale(1);
+        opacity: 1;
+    }
+}
+
+/* 加载提示 */
+.loading {
+    color: white;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: var(--font-size-loading);
+}
+
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+    display: none;
+}

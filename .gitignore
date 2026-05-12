@@ -1,0 +1,9 @@
+.venv/
+.env
+.idea/
+.vscode/
+posters/
+poster_paths.json
+__pycache__/
+*.pyc
+.DS_Store
