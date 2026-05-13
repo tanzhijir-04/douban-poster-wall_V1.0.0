@@ -1,0 +1,28 @@
+:80 {
+    root * /srv
+    file_server
+
+    # 海报图片缓存 30 天
+    handle /posters/* {
+        header Cache-Control "public, immutable, max-age=2592000"
+        file_server
+    }
+
+    # 静态资源缓存 7 天
+    handle *.css {
+        header Cache-Control "public, immutable, max-age=604800"
+        file_server
+    }
+    handle *.js {
+        header Cache-Control "public, immutable, max-age=604800"
+        file_server
+    }
+
+    # JSON 不缓存
+    handle /poster_paths.json {
+        header Cache-Control "no-cache, no-store, must-revalidate"
+        file_server
+    }
+
+    try_files {path} {path}/index.html
+}

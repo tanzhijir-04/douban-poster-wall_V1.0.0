@@ -101,3 +101,42 @@ body {
     font-size: var(--font-size-loading);
     color: var(--color-text-secondary);
 }
+
+/* 深色模式毛玻璃按钮 */
+@media (prefers-color-scheme: dark) {
+    .glass-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+    .glass-btn {
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+    .glass-btn:hover {
+        box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* 响应式：移动端 */
+@media (max-width: 640px) {
+    .header {
+        padding: var(--space-md);
+    }
+    .header h1 {
+        font-size: 1.5rem;
+    }
+    .poster-wall {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: var(--space-md);
+        padding: 0 var(--space-md);
+    }
+    .glass-btn {
+        padding: var(--space-xs) var(--space-lg);
+        font-size: 0.9rem;
+    }
+}
+
+/* 响应式：平板 */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .poster-wall {
+        max-width: 1200px;
+    }
+}

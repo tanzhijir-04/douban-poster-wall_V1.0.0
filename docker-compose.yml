@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./posters:/usr/share/nginx/html/posters
+      - ./poster_paths.json:/usr/share/nginx/html/poster_paths.json
+    restart: unless-stopped
